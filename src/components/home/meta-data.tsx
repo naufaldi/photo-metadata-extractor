@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Camera, Aperture, Clock, Code } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '../ui/button';
 
 // Define the metadata type
 interface MetadataProps {
@@ -140,6 +141,7 @@ const MetadataDisplay = ({ metadata }: MetadataProps) => {
                   <span className="font-semibold block">Altitude:</span>
                   <span>{location.altitude}</span>
                 </div>
+
               </div>
 
               {/* Camera Info */}
@@ -226,7 +228,7 @@ const MetadataDisplay = ({ metadata }: MetadataProps) => {
                   <Code className="mr-2 h-5 w-5" /> Raw Metadata
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-white p-4">
+              <AccordionContent className="bg-white p-4 h-[430px] overflow-y-auto">
                 <div className="bg-black text-green-400 p-4 rounded font-mono text-sm overflow-x-auto">
                   <pre>{JSON.stringify(raw, null, 2)}</pre>
                 </div>

@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Camera, Upload, Share, Download } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Camera, Upload, Share, Download, MapPin } from 'lucide-react';
 import EXIF from 'exif-js';
 import MetadataDisplay from '@/components/home/meta-data';
 import ImageUploader from '@/components/home/image-uploader';
@@ -13,6 +13,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { processMetadata, type MetadataType } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the LocationMap component with no SSR
+const LocationMap = dynamic(() => import('@/components/home/location-map'), { ssr: false });
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
@@ -23,8 +27,10 @@ export default function Home() {
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mapSectionRef = useRef<HTMLDivElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [showWebcam, setShowWebcam] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   // Detect if device is mobile
   useEffect(() => {
@@ -242,6 +248,14 @@ export default function Home() {
     }
   };
 
+  const handleShowMap = () => {
+    setShowMap(true);
+    // Scroll to map section with smooth animation
+    setTimeout(() => {
+      mapSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <motion.header
@@ -406,6 +420,62 @@ export default function Home() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Map Section - Full Width */}
+      {metadata && metadata.location.latitude !== 'Unknown' && metadata.location.longitude !== 'Unknown' && (
+        <div className="mt-12" ref={mapSectionRef}>
+          <AnimatePresence>
+            {!showMap ? (
+              <motion.div
+                className="flex justify-center"
+                initial={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <Button
+                  onClick={handleShowMap}
+                  variant="brutalism"
+                  className="flex items-center px-6 py-3 text-lg"
+                >
+                  <MapPin className="mr-2 h-6 w-6" />
+                  Show Location on Map
+                </Button>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0)] rounded-lg overflow-hidden">
+                  <div className="bg-blue-300 p-4 border-b-2 border-black flex justify-between items-center">
+                    <h2 className="text-2xl font-bold flex items-center">
+                      <MapPin className="mr-2 h-6 w-6" /> Location Visualization
+                    </h2>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-2 border-black"
+                      onClick={() => setShowMap(false)}
+                    >
+                      Hide Map
+                    </Button>
+                  </div>
+                  <CardContent className="p-0">
+                    <div className="h-[500px]">
+                      <LocationMap
+                        latitude={metadata.location.latitude}
+                        longitude={metadata.location.longitude}
+                        alwaysShow={true}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }
