@@ -64,7 +64,7 @@ export default function Home() {
       EXIF.getData(file, function (this: { [key: string]: unknown }) {
         const allMetadata = EXIF.getAllTags(this);
 
-        // Process the metadata into organized categories
+
         const processedMetadata = processMetadata(allMetadata, file);
         setMetadata(processedMetadata);
         setLoading(false);
@@ -109,7 +109,7 @@ export default function Home() {
         console.log("Using constraints:", JSON.stringify(constraints));
 
         try {
-          // First try to enumerate devices to ensure camera is available
+
           const devices = await navigator.mediaDevices.enumerateDevices();
           const videoDevices = devices.filter(device => device.kind === 'videoinput');
           console.log("Available video devices:", videoDevices.length);
@@ -118,10 +118,10 @@ export default function Home() {
             throw new Error("No video input devices found");
           }
 
-          // Request webcam access with specific constraints
+
           const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
-          // Double check videoRef is still available after async operation
+
           if (!videoRef.current) {
             console.error("Video reference is not available after getUserMedia");
             mediaStream.getTracks().forEach(track => track.stop());
@@ -129,11 +129,11 @@ export default function Home() {
             return;
           }
 
-          // Set the stream as the video source
+
           videoRef.current.srcObject = mediaStream;
           videoRef.current.muted = true;
 
-          // For macOS Safari, we need to manually play the video
+
           if (isMacOS && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
             console.log("Using Safari-specific video playback");
             try {
@@ -143,7 +143,7 @@ export default function Home() {
               console.error("Error playing video immediately:", e);
             }
           } else {
-            // For other browsers, use the onloadedmetadata event
+
             videoRef.current.onloadedmetadata = async () => {
               console.log("Video metadata loaded");
               if (videoRef.current) {
