@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
@@ -10,22 +9,25 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "bg-black hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] transition-all",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-red-500 text-white font-bold rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "bg-white text-black font-bold rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        brutalism: "bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all",
+          "bg-purple-400 text-black font-bold rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200",
+        ghost:
+          "bg-transparent hover:bg-gray-100 text-black font-bold rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200",
+        link:
+          "text-black underline-offset-4 underline font-bold hover:bg-yellow-300 rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200",
+        brutalism:
+          "bg-yellow-300 text-black font-bold rounded-lg border-2 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all duration-200",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        default: "h-10 px-6 py-3",
+        sm: "h-9 rounded-md px-4 py-2 text-sm",
+        lg: "h-12 rounded-md px-8 py-4 text-lg",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {
@@ -35,7 +37,14 @@ const buttonVariants = cva(
   }
 )
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "brutalism";
+    size?: "default" | "sm" | "lg" | "icon";
+    asChild?: boolean;
+  }
+>(({ className, variant, size, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
   return (
     <Comp

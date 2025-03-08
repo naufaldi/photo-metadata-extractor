@@ -28,6 +28,9 @@ function Badge({
   className,
   variant,
   ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  className?: string;
+  variant?: "default" | "secondary" | "destructive" | "outline" | "brutalism";
 }) {
   return (<div className={cn(badgeVariants({ variant }), className)} {...props} />)
 }
