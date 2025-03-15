@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Camera, Aperture, Clock, Code } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '../ui/button';
+
 
 // Define the metadata type
 interface MetadataProps {

@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload, Share, Download, MapPin } from 'lucide-react';
+import { Camera, Upload, Share, Download, MapPin, Brain } from 'lucide-react';
 import EXIF from 'exif-js';
 import MetadataDisplay from '@/components/home/meta-data';
 import ImageUploader from '@/components/home/image-uploader';
@@ -14,6 +14,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { processMetadata, type MetadataType } from '@/lib/utils';
 import dynamic from 'next/dynamic';
+import { EnhancedPhotoAnalysis } from '@/types/ai-type';
+import PhotoAnalysis from '@/components/home/photo-analysis';
+import { analyzePhotoContext } from '@/api/ai-services';
 
 // Dynamically import the LocationMap component with no SSR
 const LocationMap = dynamic(() => import('@/components/home/location-map'), { ssr: false });
@@ -31,6 +34,9 @@ export default function Home() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [showWebcam, setShowWebcam] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false);
+  const [photoAnalysis, setPhotoAnalysis] = useState<EnhancedPhotoAnalysis | null>(null);
+
 
   // Detect if device is mobile
   useEffect(() => {
@@ -256,6 +262,39 @@ export default function Home() {
     }, 100);
   };
 
+  const handleAnalyzePhoto = async () => {
+    if (!image) return;
+
+    setIsAnalyzingPhoto(true);
+    try {
+      // Convert image URL to base64
+      const response = await fetch(image);
+      const blob = await response.blob();
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        try {
+          // Remove the data URL prefix
+          const base64String = (reader.result as string).split(',')[1];
+
+          // Call the OpenAI API
+          const result = await analyzePhotoContext(base64String);
+          setPhotoAnalysis(result);
+        } catch (error) {
+          console.error("Error in photo analysis:", error);
+          alert("Failed to analyze photo. Please try again.");
+        } finally {
+          setIsAnalyzingPhoto(false);
+        }
+      };
+
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error("Error preparing photo for analysis:", error);
+      setIsAnalyzingPhoto(false);
+      alert("Failed to prepare photo for analysis. Please try again.");
+    }
+  };
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <motion.header
@@ -475,6 +514,31 @@ export default function Home() {
             )}
           </AnimatePresence>
         </div>
+      )}
+
+      {image && metadata && !photoAnalysis && !isAnalyzingPhoto && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex justify-center mt-8 mb-4"
+        >
+          <Button
+            onClick={handleAnalyzePhoto}
+            variant="brutalism"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3"
+          >
+            <Brain className="mr-2 h-5 w-5" />
+            Analyze Photo with AI
+          </Button>
+        </motion.div>
+      )}
+
+
+      {image && (
+        <PhotoAnalysis
+          analysis={photoAnalysis}
+          isLoading={isAnalyzingPhoto}
+        />
       )}
     </div>
   );
