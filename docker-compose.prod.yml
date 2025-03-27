@@ -1,0 +1,28 @@
+# docker-compose.prod.yml
+version: '3.8'
+
+services:
+  app:
+    image: ghcr.io/naufaldi/image-extract:prod
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.image-extract.rule=Host(`image.faldi.xyz`)"
+      - "traefik.http.routers.image-extract.entrypoints=websecure"
+      - "traefik.http.routers.image-extract.tls.certresolver=myresolver"
+      - "traefik.http.services.image-extract.loadbalancer.server.port=3000"
+      - "traefik.docker.network=web"
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+    deploy:
+      mode: replicated
+      replicas: 2
+    restart: always
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
