@@ -10,6 +10,9 @@ RUN bun run build
 FROM oven/bun:1-slim AS runner
 WORKDIR /app
 
+ARG OPENAI_API_KEY
+ENV OPENAI_API_KEY=$OPENAI_API_KEY
+
 ENV NODE_ENV=production
 
 # Copy necessary files from builder

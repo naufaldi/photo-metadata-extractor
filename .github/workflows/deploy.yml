@@ -59,7 +59,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64
@@ -67,6 +67,8 @@ jobs:
           tags: |
             ghcr.io/naufaldi/image-extract:${{ needs.commit-hash.outputs.commit_hash }}
             ghcr.io/naufaldi/image-extract:prod
+          build-args: |
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
