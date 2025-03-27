@@ -83,6 +83,12 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
+          echo "Starting deployment..."
+          
+          # Check if web network exists
+          echo "Checking if web network exists..."
+          docker network ls | grep web
+          
           # Create project directory
           mkdir -p ~/image-extract
           cd ~/image-extract
