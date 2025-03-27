@@ -85,10 +85,6 @@ jobs:
         script: |
           echo "Starting deployment..."
           
-          # Check if web network exists
-          echo "Checking if web network exists..."
-          docker network ls | grep web
-          
           # Create project directory
           mkdir -p ~/image-extract
           cd ~/image-extract
@@ -101,8 +97,6 @@ jobs:
           
           # Create docker-compose.prod.yml
           cat > docker-compose.prod.yml << 'EOL'
-          version: '3.8'
-          
           services:
             app:
               image: ghcr.io/naufaldi/image-extract:prod
@@ -112,7 +106,7 @@ jobs:
                 - "traefik.http.routers.image-extract.entrypoints=websecure"
                 - "traefik.http.routers.image-extract.tls.certresolver=myresolver"
                 - "traefik.http.services.image-extract.loadbalancer.server.port=3000"
-                - "traefik.docker.network=web"
+                - "traefik.docker.network=guestbook_web"
                 - "com.centurylinklabs.watchtower.enable=true"
               ports:
                 - "3000"
@@ -124,16 +118,20 @@ jobs:
                 replicas: 2
               restart: always
               networks:
-                - web
+                - guestbook_web
           
           networks:
-            web:
+            guestbook_web:
               external: true
           EOL
           
           # Deploy using docker-compose.prod.yml
           docker compose -f docker-compose.prod.yml down || true
           docker compose -f docker-compose.prod.yml up -d
+          
+          # Show running containers
+          echo "Checking running containers..."
+          docker ps | grep image-extract
           
           # Clean up old images
           docker image prune -f
