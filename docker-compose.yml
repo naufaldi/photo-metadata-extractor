@@ -14,4 +14,5 @@ services:
       - /app/.next
     environment:
       - NODE_ENV=development
-    command: npm run dev
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    command: bun run dev
