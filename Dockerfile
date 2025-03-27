@@ -1,14 +1,13 @@
-# Dockerfile
 # Build stage
-FROM node:20-alpine AS builder
+FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN bun install
 COPY . .
-RUN npm run build
+RUN bun run build
 
 # Production stage
-FROM node:20-alpine AS runner
+FROM oven/bun:1-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -22,4 +21,4 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["bun", "server.js"]
