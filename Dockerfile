@@ -1,6 +1,11 @@
 # Build stage
 FROM oven/bun:1 AS builder
 WORKDIR /app
+
+# Add these lines here, before the build step
+ARG OPENAI_API_KEY
+ENV OPENAI_API_KEY=$OPENAI_API_KEY
+
 COPY package*.json ./
 RUN bun install
 COPY . .
@@ -10,9 +15,6 @@ RUN bun run build
 FROM oven/bun:1-slim AS runner
 WORKDIR /app
 
-ARG OPENAI_API_KEY
-ENV OPENAI_API_KEY=$OPENAI_API_KEY
-
 ENV NODE_ENV=production
 
 # Copy necessary files from builder
@@ -21,7 +23,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["bun", "server.js"]
